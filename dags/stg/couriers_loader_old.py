@@ -3,7 +3,6 @@ import json
 from logging import Logger
 from typing import List
 from datetime import datetime
-from typing import Dict, List
 
 from examples.stg import EtlSetting, StgEtlSettingsRepository
 from lib import PgConnect
@@ -27,45 +26,31 @@ class CouriersApiRepository:
     # def list_objects(self, events_threshold: int, limit: int):
     def list_objects(self):
         
-        cohort = "DELIVERY_SYSTEM_COHORT"
+        cohort = "21"
         # Variable.get("X-COHORT")
-        nickname = "DELIVERY_SYSTEM_NICKNAME"
+        nickname = "usofob"
         # Variable.get("X-NICKNAME")
-        url = "DELIVERY_SYSTEM_PATH" + "/couriers"
+        url = "https://d5d04q7d963eapoepsqr.apigw.yandexcloud.net" + "/couriers"
         # Variable.get("API-URL") + "/couriers"
-        api_key = "DELIVERY_SYSTEM_API_KEY"
+        api_key = "25c27781-8fde-4b30-a22e-524044a7580f"
         # Variable.get("X-API-KEY")
 
         headers = {
-                    "X-Nickname": nickname,
-                    "X-cohort": cohort,
-                    "X-API-KEY": api_key
-                  }
-        couriers = []
-        limit = 50
-        offset = 0
-        sort_field = 'id'
-        start_data: datetime  = None
-        end_data: datetime = None
+            "X-Nickname": nickname,
+            "X-cohort": cohort,
+            "X-API-KEY": api_key
+            }
 
-        while True:
+        params = {
+            "sort_field": "_id"
+        }
 
-            params = {'limit': limit, 'offset': offset, 'sort_field': sort_field,
-                    'from': start_data.strftime('%Y-%m-%d %H:%M:%S').replace('+', ' ').split('.')[0] if start_data else None,
-                     'to': end_data.strftime('%Y-%m-%d %H:%M:%S').replace('+', ' ').split('.')[0] if start_data else None}
-
-
+        try:
             response = requests.get(url=url, headers=headers, params=params)
             response.raise_for_status()  # Raise an exception for non-200 status codes
-            courier = response.json()
-            if not courier:
-                break
-            couriers.extend(courier)
-            offset += limit
-        
-        return couriers
-            
-
+            return response.json()
+        except:
+            raise ValueError
 
 class CourierDestRepository:
 
